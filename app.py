@@ -9,7 +9,7 @@ def main():
 
 @app.route('/get_data', methods=['get'])
 def get_data():
-    df = pd.read_csv('MOCK_DATA.csv', encoding='utf8')
+    df = pd.read_csv('MOCK_DATA_SHORT.csv', encoding='utf8')
     rows = df.to_json(orient='records')
     return jsonify(rows)
 
@@ -22,4 +22,4 @@ def post_data():
     return jsonify({'response': f'Post request {request.json.get("id")} successful'})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)

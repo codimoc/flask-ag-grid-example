@@ -1,4 +1,7 @@
-var columnDefs = [
+let gridApi;
+let lastSelected;
+
+const columnDefs = [
     {headerName: "id", field: "id", width: 150},
     {headerName: "First Name", field: "first_name", width: 90, filter: 'agNumberColumnFilter'},
     {headerName: "Last Name", field: "last_name", width: 120},
@@ -15,7 +18,7 @@ var columnDefs = [
     {headerName: 'IP address', field: 'ip_address', width: 100},
     {headerName: 'Editable', field: 'editable', width: 100}];
 
-var gridOptions = {
+const gridOptions = {
     rowData: null,
     columnDefs: columnDefs,
     defaultColDef: {
@@ -26,6 +29,7 @@ var gridOptions = {
         filter: 'agTextColumnFilter'
     },
     editType: 'fullRow',
+    rowSelection: 'single',
     onRowValueChanged: function(event) {
         var data = event.data;
         var xhttp = new XMLHttpRequest();
@@ -37,16 +41,55 @@ var gridOptions = {
         xhttp.open('POST', '/post_data', true);
         xhttp.setRequestHeader("Content-type", 'application/json;charset=UTF-8"');
         xhttp.send(JSON.stringify(data));
+    },
+    onRowSelected: function(event) {
+        if (event.node.isSelected()) {
+            let data = event.data;
+            document.getElementById("gridMessage").innerHTML="Selected row " + data.id;
+            lastSelected = data.id;
+        }            
+        else {
+            if (lastSelected == event.data.id)
+                document.getElementById("gridMessage").innerHTML="";
+        }
+            
     }
+
 };
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function() {
+    // console.log('hello');
     var gridDiv = document.querySelector('#myGrid');
-    new agGrid.Grid(gridDiv, gridOptions);
+    gridApi = agGrid.createGrid(gridDiv, gridOptions);
 
-    agGrid.simpleHttpRequest({url: '/get_data'}).then(function(data) {
+    fetch('/get_data').then((data) => data.json()).then( function(data) {
+        // console.log(data);
         data = JSON.parse(data);
-        console.log(data);
-        gridOptions.api.setRowData(data);
+        //console.log(data);
+        //gridOptions.api.setRowData(data);
+        //gridApi.setRowData(data);
+        gridApi.updateGridOptions({ rowData: data });
     });
 });
+
+function addRow() {
+    const data = gridApi.getGridOption("rowData");
+    const lastIdx = data[data.length-1].id;
+    data.push({id: lastIdx+1});
+    gridApi.updateGridOptions({ rowData: data }); 
+    //gridApi.applyTransaction({add: [{id: lastIdx+1}]});
+};
+
+function deleteRow() {
+    const newData = [];
+    const data = gridApi.getGridOption("rowData");
+    const selectedData = gridApi.getSelectedRows();
+    let selectedIndex;
+    if (selectedData.length > 0)
+        selectedIndex = selectedData[0].id;
+    for (let rowKey in data) {
+        if (data[rowKey].id != selectedIndex)
+            newData.push(data[rowKey]);
+    }
+    gridApi.updateGridOptions({ rowData: newData }); 
+}
