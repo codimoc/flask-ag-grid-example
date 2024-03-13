@@ -2,7 +2,7 @@ let gridApi;
 let lastSelected;
 
 const columnDefs = [
-    {headerName: "id", field: "id", width: 150},
+    {headerName: "id", field: "id", width: 150, editable:false},
     {headerName: "First Name", field: "first_name", width: 90, filter: 'agNumberColumnFilter'},
     {headerName: "Last Name", field: "last_name", width: 120},
     {headerName: "Email", field: "email", width: 90},
