@@ -77,6 +77,13 @@ def upsert(record: dict) -> str:
                         make_input_record(record))
         connection.commit()
         return "inserted"
+    
+def delete(record: dict) -> str:
+    with get_connection() as connection:
+        cursor = connection.cursor()
+        cursor.execute("delete from contacts where id = :id", make_input_record(record))
+        connection.commit()
+        return "deleted"
 
 
 def make_input_record(in_record: dict) -> dict:

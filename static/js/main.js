@@ -85,11 +85,29 @@ function deleteRow() {
     const data = gridApi.getGridOption("rowData");
     const selectedData = gridApi.getSelectedRows();
     let selectedIndex;
+    let record;
     if (selectedData.length > 0)
         selectedIndex = selectedData[0].id;
     for (let rowKey in data) {
         if (data[rowKey].id != selectedIndex)
             newData.push(data[rowKey]);
+        else
+            record = data[rowKey];
     }
     gridApi.updateGridOptions({ rowData: newData }); 
+
+    //call the rest api to delete the row in db
+    if (record != undefined)
+    {
+        let xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function(event) {
+            if (this.readyState == 4 && this.status == 200) {
+              console.log(event.target.responseText);
+            }
+          };
+        xhttp.open('POST', '/delete_row', true);
+        xhttp.setRequestHeader("Content-type", 'application/json;charset=UTF-8"');
+        xhttp.send(JSON.stringify(record));        
+    }
+
 }

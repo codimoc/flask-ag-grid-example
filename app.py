@@ -17,11 +17,16 @@ def get_data():
 
 @app.route('/post_data', methods=['post'])
 def post_data():
-    print('From json: ',request.json)
+    print('Upsert for: ',request.json)
     if request.json:
-        print('id: ', request.json.get('id'))
-        print('first_name: ', request.json.get('first_name'))
         result = db.upsert(request.json)
+    return jsonify({'response': f'Post request {request.json.get("id")} was {result}'})
+
+@app.route('/delete_row', methods=['post'])
+def delete_row():
+    print('Delete for: ',request.json)
+    if request.json:
+        result = db.delete(request.json)
     return jsonify({'response': f'Post request {request.json.get("id")} was {result}'})
 
 
